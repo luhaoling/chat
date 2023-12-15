@@ -88,7 +88,6 @@ verifyCode:
     senderAuthorizationCode: "" # 授权码
     smtpAddr: "smtp.qq.com"  # smtp 服务器地址
     smtpPort: 465   # smtp 服务器邮件发送端口
-  testDepartMentID: 001
 
 
 # 获取ip的header,没有配置直接获取远程地址
