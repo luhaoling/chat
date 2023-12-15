@@ -57,16 +57,16 @@ mysql:
 # 没有配置表示和OpenIM一致
 log:
   storageLocation: ../logs/           #存放目录
-#  rotationTime: 24                    #日志旋转时间
-#  remainRotationCount: 2              #日志数量
-#  remainLogLevel: 6                   #日志级别 6表示全都打印，
-#  isStdout: false
-#  isJson: false
-#  withStack: false
+  rotationTime: 24                    #日志旋转时间
+  remainRotationCount: 2              #日志数量
+  remainLogLevel: 6                   #日志级别 6表示全都打印，
+  isStdout: false
+  isJson: false
+  withStack: false
 
-# secret: openIM123
-#tokenPolicy:
-#  expire: 86400
+ secret: openIM123
+ tokenPolicy:
+  expire: 86400
 
 verifyCode:
   validTime: 300 # 验证码有效时间
@@ -89,7 +89,6 @@ verifyCode:
     smtpAddr: "smtp.qq.com"  # smtp 服务器地址
     smtpPort: 465   # smtp 服务器邮件发送端口
   testDepartMentID: 001
-  imAPIURL: http://127.0.0.1:10002
 
 
 # 获取ip的header,没有配置直接获取远程地址
@@ -110,6 +109,6 @@ adminList:
 openIMUrl: "http://127.0.0.1:10002"
 
 redis:
-  # address: [ 127.0.0.1:16379 ]
-  # username:
-  # password: openIM123
+   address: [ 127.0.0.1:16379 ]
+   username:
+   password: openIM123
