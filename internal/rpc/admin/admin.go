@@ -106,6 +106,7 @@ func (o *adminServer) ChangeAdminPassword(ctx context.Context, req *admin.Change
 		return nil, err
 	}
 
+	log.ZInfo(ctx, "updateUserInfo", "user.password", user.Password, "currentPassword", req.CurrentPassword)
 	if user.Password != req.CurrentPassword {
 		return nil, errs.ErrInternalServer.Wrap("password error")
 	}
