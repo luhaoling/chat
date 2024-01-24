@@ -22,10 +22,6 @@ import (
 	"github.com/OpenIMSDK/chat/pkg/common/config"
 )
 
-var (
-	MaxConnectTimes = 200
-)
-
 func ComponentCheck() error {
 
 	if config.Config.Envs.Discovery != "k8s" {
@@ -35,7 +31,7 @@ func ComponentCheck() error {
 			{Name: "MySQL", Function: component.CheckMySQL, Config: config.Config.Redis},
 		}
 
-		for i := 0; i < MaxConnectTimes; i++ {
+		for i := 0; i < component.MaxRetry; i++ {
 			if i != 0 {
 				time.Sleep(1 * time.Second)
 			}
