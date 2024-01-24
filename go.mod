@@ -96,3 +96,5 @@ require (
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 )
+
+replace github.com/OpenIMSDK/tools v0.0.23 => github.com/luhaoling/tools v0.0.0-20240124081850-a76e62033eaa

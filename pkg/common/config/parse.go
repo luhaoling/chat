@@ -206,15 +206,12 @@ func findConfigPath(configFile string) (string, error) {
 	return "", errs.Wrap(errors.New("the config.yaml path not found"))
 }
 
-func FlagParse() (string, int, bool, bool, error) {
+func FlagParse() (string, int, bool, error) {
 	var configFile string
 	flag.StringVar(&configFile, "config_folder_path", "", "Config full path")
 
 	var ginPort int
 	flag.IntVar(&ginPort, "port", 10009, "get ginServerPort from cmd")
-
-	var hide bool
-	flag.BoolVar(&hide, "hide", false, "hide the ComponentCheck result")
 
 	// Version flag
 	var showVersion bool
@@ -224,9 +221,9 @@ func FlagParse() (string, int, bool, bool, error) {
 
 	configFile, err := findConfigPath(configFile)
 	if err != nil {
-		return "", 0, false, false, err
+		return "", 0, false, err
 	}
-	return configFile, ginPort, hide, showVersion, nil
+	return configFile, ginPort, showVersion, nil
 }
 
 func configGetEnv() error {
