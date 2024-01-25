@@ -29,7 +29,7 @@ var Config struct {
 	} `yaml:"envs"`
 	Zookeeper struct {
 		Schema   string   `yaml:"schema"`
-		ZkAddr   []string `yaml:"zkAddr"`
+		ZkAddr   []string `yaml:"address"`
 		Username string   `yaml:"username"`
 		Password string   `yaml:"password"`
 	} `yaml:"zookeeper"`
@@ -46,9 +46,11 @@ var Config struct {
 		ListenIP   string `yaml:"listenIP"`
 	} `yaml:"rpc"`
 	Redis struct {
-		Address  *[]string `yaml:"address"`
-		Username string    `yaml:"username"`
-		Password string    `yaml:"password"`
+		ClusterMode    bool     `yaml:"clusterMode"`
+		Address        []string `yaml:"address"`
+		Username       string   `yaml:"username"`
+		Password       string   `yaml:"password"`
+		EnablePipeline bool     `yaml:"enablePipeline"`
 	} `yaml:"redis"`
 	RpcPort struct {
 		OpenImAdminPort []int `yaml:"openImAdminPort"`
@@ -59,15 +61,15 @@ var Config struct {
 		OpenImChatName  string `yaml:"openImChatName"`
 	} `yaml:"rpcRegisterName"`
 	Mysql struct {
-		Address       *[]string `yaml:"address"`
-		Username      *string   `yaml:"username"`
-		Password      *string   `yaml:"password"`
-		Database      *string   `yaml:"database"`
-		MaxOpenConn   *int      `yaml:"maxOpenConn"`
-		MaxIdleConn   *int      `yaml:"maxIdleConn"`
-		MaxLifeTime   *int      `yaml:"maxLifeTime"`
-		LogLevel      *int      `yaml:"logLevel"`
-		SlowThreshold *int      `yaml:"slowThreshold"`
+		Address       []string `yaml:"address"`
+		Username      string   `yaml:"username"`
+		Password      string   `yaml:"password"`
+		Database      string   `yaml:"database"`
+		MaxOpenConn   int      `yaml:"maxOpenConn"`
+		MaxIdleConn   int      `yaml:"maxIdleConn"`
+		MaxLifeTime   int      `yaml:"maxLifeTime"`
+		LogLevel      int      `yaml:"logLevel"`
+		SlowThreshold int      `yaml:"slowThreshold"`
 	} `yaml:"mysql"`
 	Log struct {
 		StorageLocation     *string `yaml:"storageLocation"`

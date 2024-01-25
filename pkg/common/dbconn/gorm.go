@@ -31,7 +31,7 @@ import (
 func NewMysqlGormDB() (*gorm.DB, error) {
 	// Construct the DSN (Data Source Name)
 	dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8mb4&parseTime=true&loc=Local",
-		*config.Config.Mysql.Username, *config.Config.Mysql.Password, (*config.Config.Mysql.Address)[0], "mysql")
+		config.Config.Mysql.Username, config.Config.Mysql.Password, (config.Config.Mysql.Address)[0], "mysql")
 
 	// First attempt to open a new database connection
 	db, err := gorm.Open(mysql.Open(dsn), nil)
@@ -50,17 +50,17 @@ func NewMysqlGormDB() (*gorm.DB, error) {
 		return nil, fmt.Errorf("failed to get underlying sql.DB from GORM with DSN %s: %w", dsn, err)
 	}
 	defer sqlDB.Close()
-	sql := fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s default charset utf8mb4 COLLATE utf8mb4_unicode_ci;", *config.Config.Mysql.Database)
+	sql := fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s default charset utf8mb4 COLLATE utf8mb4_unicode_ci;", config.Config.Mysql.Database)
 	err = db.Exec(sql).Error
 	if err != nil {
 		return nil, fmt.Errorf("init db %w", err)
 	}
 	// Reconnect with the specific database
 	dsn = fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8mb4&parseTime=true&loc=Local",
-		*config.Config.Mysql.Username, *config.Config.Mysql.Password, (*config.Config.Mysql.Address)[0], *config.Config.Mysql.Database)
+		config.Config.Mysql.Username, config.Config.Mysql.Password, (config.Config.Mysql.Address)[0], config.Config.Mysql.Database)
 
 	// Custom logger
-	sqlLogger := log.NewSqlLogger(logger.LogLevel(*config.Config.Mysql.LogLevel), true, time.Duration(*config.Config.Mysql.SlowThreshold)*time.Millisecond)
+	sqlLogger := log.NewSqlLogger(logger.LogLevel(config.Config.Mysql.LogLevel), true, time.Duration(config.Config.Mysql.SlowThreshold)*time.Millisecond)
 
 	// Second attempt to open a new database connection
 	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
@@ -78,9 +78,9 @@ func NewMysqlGormDB() (*gorm.DB, error) {
 	}
 
 	// Database connection configuration
-	sqlDB.SetConnMaxLifetime(time.Second * time.Duration(*config.Config.Mysql.MaxLifeTime))
-	sqlDB.SetMaxOpenConns(*config.Config.Mysql.MaxOpenConn)
-	sqlDB.SetMaxIdleConns(*config.Config.Mysql.MaxIdleConn)
+	sqlDB.SetConnMaxLifetime(time.Second * time.Duration(config.Config.Mysql.MaxLifeTime))
+	sqlDB.SetMaxOpenConns(config.Config.Mysql.MaxOpenConn)
+	sqlDB.SetMaxIdleConns(config.Config.Mysql.MaxIdleConn)
 
 	return db, nil
 }
