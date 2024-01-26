@@ -27,8 +27,8 @@ func ComponentCheck() error {
 	if config.Config.Envs.Discovery != "k8s" {
 		checks := []component.CheckFunc{
 			{Name: "Zookeeper", Function: component.CheckZookeeper, Config: config.Config.Zookeeper},
-			{Name: "Redis", Function: component.CheckRedis, Config: config.Config.Mysql},
-			{Name: "MySQL", Function: component.CheckMySQL, Config: config.Config.Redis},
+			{Name: "Redis", Function: component.CheckRedis, Config: config.Config.Redis},
+			{Name: "MySQL", Function: component.CheckMySQL, Config: config.Config.Mysql},
 		}
 
 		for i := 0; i < component.MaxRetry; i++ {
