@@ -237,9 +237,9 @@ func configGetEnv() error {
 	Config.Rpc.RegisterIP = getEnv("RPC_REGISTER_IP", Config.Rpc.RegisterIP)
 	Config.Rpc.ListenIP = getEnv("RPC_LISTEN_IP", Config.Rpc.ListenIP)
 
-	Config.Mysql.Username = getEnvStringPoint("MYSQL_USERNAME", Config.Mysql.Username)
-	Config.Mysql.Password = getEnvStringPoint("MYSQL_PASSWORD", Config.Mysql.Password)
-	Config.Mysql.Database = getEnvStringPoint("MYSQL_DATABASE", Config.Mysql.Database)
+	Config.Mysql.Username = getEnv("MYSQL_USERNAME", Config.Mysql.Username)
+	Config.Mysql.Password = getEnv("MYSQL_PASSWORD", Config.Mysql.Password)
+	Config.Mysql.Database = getEnv("MYSQL_DATABASE", Config.Mysql.Database)
 	Config.Mysql.Address = getArrPointEnv("MYSQL_ADDRESS", "MYSQL_PORT", Config.Mysql.Address)
 
 	Config.Log.StorageLocation = getEnvStringPoint("LOG_STORAGE_LOCATION", Config.Log.StorageLocation)
@@ -273,14 +273,14 @@ func getArrEnv(key1, key2 string, fallback []string) {
 	Config.Zookeeper.ZkAddr = arr
 }
 
-func getArrPointEnv(key1, key2 string, fallback *[]string) *[]string {
+func getArrPointEnv(key1, key2 string, fallback []string) []string {
 	str1 := getEnv(key1, "")
 	str2 := getEnv(key2, "")
 	str := fmt.Sprintf("%s:%s", str1, str2)
 	if len(str) <= 1 {
 		return fallback
 	}
-	return &[]string{str}
+	return []string{str}
 }
 
 func getStringEnv(key1, key2 string, fallback string) string {
