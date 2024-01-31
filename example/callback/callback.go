@@ -73,6 +73,17 @@ func CallbackExample(c *gin.Context) {
 	}
 }
 
+func MsgPush(c *gin.Context) {
+	pushInfo, err := handlingCallbackOnlinePushCommand(c)
+	if err != nil {
+		log.ZError(c, "handlingCallbackAfterSendMsg failed", err)
+		return
+	}
+
+	log.ZDebug(c, "MsgPush", pushInfo)
+
+}
+
 // struct to map
 func convertStructToMap(input interface{}) (map[string]interface{}, error) {
 	result := make(map[string]interface{})
@@ -155,6 +166,28 @@ func handlingCallbackAfterSendMsg(c *gin.Context) (*apistruct.CallbackAfterSendS
 	}
 
 	resp := apistruct.CallbackAfterSendSingleMsgResp{
+		CommonCallbackResp: apistruct.CommonCallbackResp{
+			ActionCode: 0,
+			ErrCode:    200,
+			ErrMsg:     "success",
+			ErrDlt:     "successful",
+			NextCode:   0,
+		},
+	}
+	c.JSON(http.StatusOK, resp)
+	return &req, nil
+}
+
+// handlingOnlinePushCommand Handling callbacks after sending a message
+func handlingCallbackOnlinePushCommand(c *gin.Context) (*apistruct.CallbackBeforePushReq, error) {
+
+	var req apistruct.CallbackBeforePushReq
+
+	if err := c.BindJSON(&req); err != nil {
+		return nil, err
+	}
+
+	resp := apistruct.CallbackBeforePushResp{
 		CommonCallbackResp: apistruct.CommonCallbackResp{
 			ActionCode: 0,
 			ErrCode:    200,

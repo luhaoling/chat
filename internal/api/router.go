@@ -57,7 +57,9 @@ func NewChatRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegis
 
 	router.Group("/callback").POST("/open_im", chat.OpenIMCallback) // Callback
 
-	router.Group("/callbackExample").POST("/callbackAfterSendSingleMsgCommand", callback.CallbackExample)
+	webhook := router.Group("/callbackExample")
+	webhook.POST("/callbackAfterSendSingleMsgCommand", callback.CallbackExample)
+	webhook.POST("/callbackOnlinePushCommand", callback.MsgPush)
 
 	logs := router.Group("/logs", mw.CheckToken)
 	logs.POST("/upload", chat.UploadLogs)
