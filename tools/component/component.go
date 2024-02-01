@@ -16,6 +16,7 @@ package component
 
 import (
 	"fmt"
+	"github.com/OpenIMSDK/tools/errs"
 	"time"
 
 	"github.com/OpenIMSDK/chat/pkg/common/config"
@@ -65,7 +66,7 @@ func ComponentCheck() error {
 			}
 		}
 	}
-	return err
+	return errs.Wrap(err)
 }
 
 // checkZookeeper checks the Zookeeper connection
