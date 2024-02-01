@@ -26,8 +26,6 @@ import (
 	"github.com/OpenIMSDK/chat/pkg/discovery_register"
 	"github.com/OpenIMSDK/tools/discoveryregistry"
 
-	"github.com/OpenIMSDK/chat/tools/component"
-
 	mw2 "github.com/OpenIMSDK/chat/pkg/common/mw"
 	"github.com/OpenIMSDK/chat/pkg/common/version"
 
@@ -73,10 +71,10 @@ func main() {
 		fmt.Println("err ", err.Error())
 		panic(err)
 	}
-	err = component.ComponentCheck()
-	if err != nil {
-		panic(err)
-	}
+	//err = component.ComponentCheck()
+	//if err != nil {
+	//	panic(err)
+	//}
 	if err := log.InitFromConfig("chat.log", "chat-api", *config.Config.Log.RemainLogLevel, *config.Config.Log.IsStdout, *config.Config.Log.IsJson, *config.Config.Log.StorageLocation, *config.Config.Log.RemainRotationCount, *config.Config.Log.RotationTime); err != nil {
 		panic(fmt.Errorf("InitFromConfig failed:%w", err))
 	}
