@@ -16,7 +16,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/fatih/color"
+	"github.com/OpenIMSDK/tools/component"
 	"math/rand"
 	"time"
 
@@ -63,7 +63,7 @@ func main() {
 	}
 	err = chatrpcstart.Start(rpcPort, config.Config.RpcRegisterName.OpenImChatName, 0, chat.Start)
 	if err != nil {
-		color.Red(err.Error())
+		component.ErrorPrint(err.Error())
 		panic(err)
 	}
 }

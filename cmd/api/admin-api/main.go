@@ -16,6 +16,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/OpenIMSDK/tools/component"
 	"github.com/OpenIMSDK/tools/errs"
 	"github.com/fatih/color"
 	"math/rand"
@@ -91,7 +92,7 @@ func main() {
 
 	address := net.JoinHostPort(config.Config.AdminApi.ListenIP, strconv.Itoa(ginPort))
 	if err := engine.Run(address); err != nil {
-		color.Red(err.Error())
+		component.ErrorPrint(err.Error())
 		panic(err)
 	}
 }
