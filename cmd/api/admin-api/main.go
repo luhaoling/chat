@@ -17,6 +17,7 @@ package main
 import (
 	"fmt"
 	"github.com/OpenIMSDK/tools/errs"
+	"github.com/fatih/color"
 	"math/rand"
 	"net"
 	"strconv"
@@ -43,6 +44,7 @@ func main() {
 	rand.Seed(time.Now().UnixNano())
 	configFile, ginPort, showVersion, err := config.FlagParse()
 	if err != nil {
+		color.Red(err.Error())
 		panic(err)
 	}
 

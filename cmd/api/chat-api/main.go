@@ -17,7 +17,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/OpenIMSDK/chat/tools/component"
 	"github.com/OpenIMSDK/tools/errs"
+	"github.com/fatih/color"
 	"math/rand"
 	"net"
 	"strconv"
@@ -71,10 +73,11 @@ func main() {
 		fmt.Println("err ", err.Error())
 		panic(err)
 	}
-	//err = component.ComponentCheck()
-	//if err != nil {
-	//	panic(err)
-	//}
+	err = component.ComponentCheck()
+	if err != nil {
+		color.Red(err.Error())
+		panic(err)
+	}
 	if err := log.InitFromConfig("chat.log", "chat-api", *config.Config.Log.RemainLogLevel, *config.Config.Log.IsStdout, *config.Config.Log.IsJson, *config.Config.Log.StorageLocation, *config.Config.Log.RemainRotationCount, *config.Config.Log.RotationTime); err != nil {
 		panic(fmt.Errorf("InitFromConfig failed:%w", err))
 	}

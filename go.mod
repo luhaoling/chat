@@ -27,6 +27,7 @@ require (
 require (
 	github.com/OpenIMSDK/protocol v0.0.21
 	github.com/OpenIMSDK/tools v0.0.31
+	github.com/fatih/color v1.16.0
 	github.com/redis/go-redis/v9 v9.2.1
 	github.com/xuri/excelize/v2 v2.8.0
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
@@ -76,7 +77,8 @@ require (
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/leodido/go-urn v1.2.4 // indirect
 	github.com/lestrrat-go/strftime v1.0.6 // indirect
-	github.com/mattn/go-isatty v0.0.19 // indirect
+	github.com/mattn/go-colorable v0.1.13 // indirect
+	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
 	github.com/minio/minio-go/v7 v7.0.66 // indirect
 	github.com/minio/sha256-simd v1.0.1 // indirect

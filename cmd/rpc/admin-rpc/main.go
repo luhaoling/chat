@@ -17,6 +17,8 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/OpenIMSDK/chat/tools/component"
+	"github.com/fatih/color"
 	"math/rand"
 	"time"
 
@@ -53,10 +55,11 @@ func main() {
 	if err := config.InitConfig(configFile); err != nil {
 		panic(err)
 	}
-	//err = component.ComponentCheck()
-	//if err != nil {
-	//	panic(err)
-	//}
+	err = component.ComponentCheck()
+	if err != nil {
+		color.Red(err.Error())
+		panic(err)
+	}
 	if config.Config.Envs.Discovery == "k8s" {
 		rpcPort = 80
 	}
