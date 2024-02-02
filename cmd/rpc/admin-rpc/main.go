@@ -17,7 +17,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/OpenIMSDK/chat/tools/component"
 	"github.com/fatih/color"
 	"math/rand"
 	"time"
@@ -55,7 +54,7 @@ func main() {
 	if err := config.InitConfig(configFile); err != nil {
 		panic(err)
 	}
-	err = component.ComponentCheck()
+	//err = component.ComponentCheck()
 	//if err != nil {
 	//	color.Red(err.Error())
 	//	panic(err)
