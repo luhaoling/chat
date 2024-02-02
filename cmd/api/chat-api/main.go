@@ -101,7 +101,7 @@ func main() {
 
 	address := net.JoinHostPort(config.Config.ChatApi.ListenIP, strconv.Itoa(ginPort))
 	if err := engine.Run(address); err != nil {
-		component.ErrorPrint(err.Error())
+		component.ErrorPrint(errs.Unwrap(err).Error())
 		panic(err)
 	}
 }

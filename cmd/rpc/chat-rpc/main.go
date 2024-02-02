@@ -17,6 +17,7 @@ package main
 import (
 	"fmt"
 	"github.com/OpenIMSDK/tools/component"
+	"github.com/OpenIMSDK/tools/errs"
 	"math/rand"
 	"time"
 
@@ -63,7 +64,7 @@ func main() {
 	}
 	err = chatrpcstart.Start(rpcPort, config.Config.RpcRegisterName.OpenImChatName, 0, chat.Start)
 	if err != nil {
-		component.ErrorPrint(err.Error())
+		component.ErrorPrint(errs.Unwrap(err).Error())
 		panic(err)
 	}
 }
