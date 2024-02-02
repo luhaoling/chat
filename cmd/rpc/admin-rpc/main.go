@@ -56,10 +56,10 @@ func main() {
 		panic(err)
 	}
 	err = component.ComponentCheck()
-	if err != nil {
-		color.Red(err.Error())
-		panic(err)
-	}
+	//if err != nil {
+	//	color.Red(err.Error())
+	//	panic(err)
+	//}
 	if config.Config.Envs.Discovery == "k8s" {
 		rpcPort = 80
 	}
@@ -68,6 +68,7 @@ func main() {
 	}
 	err = chatrpcstart.Start(rpcPort, config.Config.RpcRegisterName.OpenImAdminName, 0, admin.Start)
 	if err != nil {
+		color.Red(err.Error())
 		panic(err)
 	}
 }

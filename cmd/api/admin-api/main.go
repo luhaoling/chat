@@ -91,6 +91,7 @@ func main() {
 
 	address := net.JoinHostPort(config.Config.AdminApi.ListenIP, strconv.Itoa(ginPort))
 	if err := engine.Run(address); err != nil {
+		color.Red(err.Error())
 		panic(err)
 	}
 }
