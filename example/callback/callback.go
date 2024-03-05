@@ -60,6 +60,8 @@ func CallbackExample(c *gin.Context) {
 		return
 	}
 
+	log.ZDebug(c, "11111111111111111111111111111")
+
 	// 2. If the user receiving the message is a customer service bot, return the message.
 	// 2.1 UserID of the robot account
 	robotics := "8984310631"
@@ -85,6 +87,7 @@ func CallbackExample(c *gin.Context) {
 		log.ZError(c, "getRobotAccountInfo failed", err)
 		return
 	}
+	log.ZDebug(c, "2222222222222222222222222222222222")
 
 	// 2.5 Constructing Message Field Contents
 	mapStruct, err := contextToMap(c, msgInfo)
@@ -95,6 +98,7 @@ func CallbackExample(c *gin.Context) {
 
 	// 2.6 call "http://43.134.63.160/smart_qa"
 	query, ok := mapStruct["content"].(string)
+	log.ZDebug(c, "33333333333333333333333333", query)
 	if !ok {
 		log.ZError(c, "str, ok := any.(string)", errors.New("the query formate is error"))
 	}
@@ -106,10 +110,9 @@ func CallbackExample(c *gin.Context) {
 	if err != nil {
 		log.ZError(c, "callSmartQa failed", err)
 	}
+	log.ZDebug(c, "444444444444444444444444444444444444444444444444444", martQaResp)
 
-	mapStruct["data"] = martQaResp.Answer
-	mapStruct["description"] = martQaResp.Source
-	mapStruct["extension"] = ""
+	mapStruct["content"] = martQaResp.Answer + martQaResp.Source
 
 	// 2.7 Send Message
 	err = sendMessage(c, adminToken.ImToken, msgInfo, robUser, mapStruct)
@@ -344,7 +347,7 @@ func sendMessage(c *gin.Context, token string, req *apistruct.CallbackAfterSendS
 			SenderFaceURL:    rob.FaceURL,
 			SenderPlatformID: req.SenderPlatformID,
 			Content:          mapStruct,
-			ContentType:      110,
+			ContentType:      req.ContentType,
 			SessionType:      req.SessionType,
 			SendTime:         utils.GetCurrentTimestampByMill(), // millisecond
 		},
