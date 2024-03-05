@@ -45,15 +45,15 @@ type SmartQaReq struct {
 	Query string `json:"query"`
 }
 
-type data struct {
-	Answer string   `json:"answer"`
-	Source []string `json:"source"`
+type SmartQaResp struct {
+	Data    DataEntity `json:"data"`
+	Messge  string     `json:"messge"`
+	Retcode int64      `json:"retcode"`
 }
 
-type SmartQaResp struct {
-	Data    data   `json:"data"`
-	Message string `json:"message"`
-	Retcode int    `json:"retcode"`
+type DataEntity struct {
+	Answer string        `json:"answer"`
+	Source []interface{} `json:"source"`
 }
 
 func CallbackExample(c *gin.Context) {
@@ -118,7 +118,16 @@ func CallbackExample(c *gin.Context) {
 	}
 	log.ZDebug(c, "444444444444444444444444444444444444444444444444444", "martQaResp", martQaResp)
 
-	mapStruct["content"] = fmt.Sprintf("answer:%s\nsource:%s", martQaResp.Data.Answer, strings.Join(martQaResp.Data.Source, "\n"))
+	source := make([]string, len(martQaResp.Data.Source))
+	for _, val := range martQaResp.Data.Source {
+		str, ok := val.(string)
+		if !ok {
+			log.ZError(c, "martQaResp.Data.Source not string", errors.New("martQaResp.Data.Source is not string"))
+		}
+		source = append(source, str)
+	}
+
+	mapStruct["content"] = fmt.Sprintf("answer:%s\nsource:%s", martQaResp.Data.Answer, strings.Join(source, "\n"))
 
 	// 2.7 Send Message
 	err = sendMessage(c, adminToken.ImToken, msgInfo, robUser, mapStruct)
@@ -381,11 +390,11 @@ func callSmartQa(c *gin.Context, smartQaRea *SmartQaReq) (*SmartQaResp, error) {
 	log.ZDebug(c, "callSmartQa!!!!!!!!!!!!!!!!!!!!!!!!!!!", "body", string(body))
 
 	response := &SmartQaResp{
-		Data: data{
+		Data: DataEntity{
 			Answer: "",
-			Source: make([]string, 10),
+			Source: make([]interface{}, 10),
 		},
-		Message: "",
+		Messge:  "",
 		Retcode: 0,
 	}
 
@@ -397,7 +406,7 @@ func callSmartQa(c *gin.Context, smartQaRea *SmartQaReq) (*SmartQaResp, error) {
 	log.ZDebug(c, "?????????????????????????????????????????", "body", response)
 
 	if response.Retcode != 0 {
-		return nil, fmt.Errorf("call \"http://43.134.63.160/smart_qa\" error, resp.Retcode:%d", resp.Retcode)
+		return nil, fmt.Errorf("call \"http://43.134.63.160/smart_qa\" error, resp.Retcode:%d", response)
 	}
 
 	return response, nil
