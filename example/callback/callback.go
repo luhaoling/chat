@@ -382,7 +382,11 @@ func callSmartQa(c *gin.Context, smartQaRea *SmartQaReq) (*SmartQaResp, error) {
 		Data SmartQaResp `json:"data"`
 	}
 
-	var response Response
+	response := &Response{
+		Data: SmartQaResp{
+			Source: make([]string, 10),
+		},
+	}
 
 	err = json.Unmarshal(body, &response)
 	if err != nil {
