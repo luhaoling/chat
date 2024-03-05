@@ -96,6 +96,8 @@ func CallbackExample(c *gin.Context) {
 		return
 	}
 
+	log.ZDebug(c, "2222222222222222222222222222222222")
+
 	// 2.6 call "http://43.134.63.160/smart_qa"
 	query, ok := mapStruct["content"].(string)
 	log.ZDebug(c, "get im admin token", "query", query)
@@ -376,16 +378,22 @@ func callSmartQa(c *gin.Context, smartQaRea *SmartQaReq) (*SmartQaResp, error) {
 
 	var resp SmartQaResp
 
-	err = json.Unmarshal(body, &resp)
+	type Response struct {
+		Data SmartQaResp `json:"data"`
+	}
+
+	var response Response
+
+	err = json.Unmarshal(body, &response)
 	if err != nil {
 		return nil, fmt.Errorf("json.Unmarshal failed,err:%v", err)
 	}
 
-	log.ZDebug(c, "?????????????????????????????????????????", "body", body)
+	log.ZDebug(c, "?????????????????????????????????????????", "body", response)
 
 	if resp.Retcode != 0 {
 		return nil, fmt.Errorf("call \"http://43.134.63.160/smart_qa\" error, resp.Retcode:%d", resp.Retcode)
 	}
 
-	return &resp, nil
+	return &response.Data, nil
 }
