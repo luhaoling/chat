@@ -62,7 +62,7 @@ func CallbackExample(c *gin.Context) {
 
 	// 2. If the user receiving the message is a customer service bot, return the message.
 	// 2.1 UserID of the robot account
-	robotics := "robotics"
+	robotics := "8984310631"
 
 	// 2.2 ChatRobot account validation and determining if messages are text and images
 	if msgInfo.SendID == robotics || msgInfo.RecvID != robotics {
