@@ -98,7 +98,7 @@ func CallbackExample(c *gin.Context) {
 
 	// 2.6 call "http://43.134.63.160/smart_qa"
 	query, ok := mapStruct["content"].(string)
-	log.ZDebug(c, "33333333333333333333333333", query)
+	log.ZDebug(c, "get im admin token", "query", query)
 	if !ok {
 		log.ZError(c, "str, ok := any.(string)", errors.New("the query formate is error"))
 	}
@@ -110,7 +110,7 @@ func CallbackExample(c *gin.Context) {
 	if err != nil {
 		log.ZError(c, "callSmartQa failed", err)
 	}
-	log.ZDebug(c, "444444444444444444444444444444444444444444444444444", martQaResp)
+	log.ZDebug(c, "444444444444444444444444444444444444444444444444444", "martQaResp", martQaResp)
 
 	mapStruct["content"] = martQaResp.Answer + martQaResp.Source
 
@@ -372,12 +372,16 @@ func callSmartQa(c *gin.Context, smartQaRea *SmartQaReq) (*SmartQaResp, error) {
 		return nil, err
 	}
 
+	log.ZDebug(c, "callSmartQa!!!!!!!!!!!!!!!!!!!!!!!!!!!", "body", string(body))
+
 	var resp SmartQaResp
 
 	err = json.Unmarshal(body, &resp)
 	if err != nil {
 		return nil, fmt.Errorf("json.Unmarshal failed,err:%v", err)
 	}
+
+	log.ZDebug(c, "?????????????????????????????????????????", "body", body)
 
 	if resp.Retcode != 0 {
 		return nil, fmt.Errorf("call \"http://43.134.63.160/smart_qa\" error, resp.Retcode:%d", resp.Retcode)
