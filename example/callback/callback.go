@@ -46,10 +46,10 @@ type SmartQaReq struct {
 }
 
 type SmartQaResp struct {
-	Answer  string `json:"answer"`
-	Source  string `json:"source"`
-	Message string `json:"message"`
-	Retcode int    `json:"retcode"`
+	Answer  string   `json:"answer"`
+	Source  []string `json:"source"`
+	Message string   `json:"message"`
+	Retcode int      `json:"retcode"`
 }
 
 func CallbackExample(c *gin.Context) {
