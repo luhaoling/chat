@@ -45,11 +45,15 @@ type SmartQaReq struct {
 	Query string `json:"query"`
 }
 
+type data struct {
+	Answer string   `json:"answer"`
+	Source []string `json:"source"`
+}
+
 type SmartQaResp struct {
-	Answer  string   `json:"answer"`
-	Source  []string `json:"source"`
-	Message string   `json:"message"`
-	Retcode int      `json:"retcode"`
+	Data    data   `json:"data"`
+	Message string `json:"message"`
+	Retcode int    `json:"retcode"`
 }
 
 func CallbackExample(c *gin.Context) {
@@ -114,7 +118,7 @@ func CallbackExample(c *gin.Context) {
 	}
 	log.ZDebug(c, "444444444444444444444444444444444444444444444444444", "martQaResp", martQaResp)
 
-	mapStruct["content"] = martQaResp.Answer + martQaResp.Source
+	mapStruct["content"] = fmt.Sprintf("answer:%s\nsource:%s", martQaResp.Data.Answer, strings.Join(martQaResp.Data.Source, "\n"))
 
 	// 2.7 Send Message
 	err = sendMessage(c, adminToken.ImToken, msgInfo, robUser, mapStruct)
@@ -376,16 +380,13 @@ func callSmartQa(c *gin.Context, smartQaRea *SmartQaReq) (*SmartQaResp, error) {
 
 	log.ZDebug(c, "callSmartQa!!!!!!!!!!!!!!!!!!!!!!!!!!!", "body", string(body))
 
-	var resp SmartQaResp
-
-	type Response struct {
-		Data SmartQaResp `json:"data"`
-	}
-
-	response := &Response{
-		Data: SmartQaResp{
+	response := &SmartQaResp{
+		Data: data{
+			Answer: "",
 			Source: make([]string, 10),
 		},
+		Message: "",
+		Retcode: 0,
 	}
 
 	err = json.Unmarshal(body, &response)
@@ -395,9 +396,9 @@ func callSmartQa(c *gin.Context, smartQaRea *SmartQaReq) (*SmartQaResp, error) {
 
 	log.ZDebug(c, "?????????????????????????????????????????", "body", response)
 
-	if resp.Retcode != 0 {
+	if response.Retcode != 0 {
 		return nil, fmt.Errorf("call \"http://43.134.63.160/smart_qa\" error, resp.Retcode:%d", resp.Retcode)
 	}
 
-	return &response.Data, nil
+	return response, nil
 }
