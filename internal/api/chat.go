@@ -360,7 +360,7 @@ func (o *ChatApi) UserRegister(c *gin.Context) {
 	}
 
 	users, err := o.chatClient.FindUserPublicInfo(c, searchUser)
-	if users == nil {
+	if len(users.Users) == 0 {
 		addUser := &chat.AddUserAccountReq{
 			Ip:       "",
 			DeviceID: "",
