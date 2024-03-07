@@ -364,6 +364,8 @@ func (o *ChatApi) UserRegister(c *gin.Context) {
 	}
 
 	users, err := o.chatClient.FindUserPublicInfo(c, searchUser)
+
+	var flag bool
 	if users.Users == nil {
 		addUser := &chat.AddUserAccountReq{
 			Ip:       "",
@@ -401,7 +403,7 @@ func (o *ChatApi) UserRegister(c *gin.Context) {
 			return
 		}
 		log.ZDebug(c, "RegisterUserAfter", "register", userInfo)
-
+		flag = true
 	}
 
 	userToken, err := o.adminClient.CreateToken(c, &admin.CreateTokenReq{
@@ -424,58 +426,59 @@ func (o *ChatApi) UserRegister(c *gin.Context) {
 		UserID:    req.UserID,
 	}
 
-	go func() {
+	if flag {
+		go func() {
+			mapStruct := make(map[string]any, 1)
+			mapStruct["content"] = "欢迎使用 openIM, 你可以向我提问题"
 
-		mapStruct := make(map[string]any, 1)
-		mapStruct["content"] = "欢迎使用 openIM, 你可以向我提问题"
+			searchSender := &chat.FindUserPublicInfoReq{
+				UserIDs: []string{callback.Robotics},
+			}
+			sender, err := o.chatClient.FindUserPublicInfo(c, searchSender)
+			log.ZDebug(c, "sender", "sender", sender)
+			if err != nil || sender.Users == nil {
+				log.ZError(c, "find robotics failed", err)
+				apiresp.GinError(c, err)
+				return
+			}
 
-		searchSender := &chat.FindUserPublicInfoReq{
-			UserIDs: []string{callback.Robotics},
-		}
-		sender, err := o.chatClient.FindUserPublicInfo(c, searchSender)
-		log.ZDebug(c, "sender", "sender", sender)
-		if err != nil || sender.Users == nil {
-			log.ZError(c, "find robotics failed", err)
-			apiresp.GinError(c, err)
-			return
-		}
+			input := &apistruct.SendMsgReq{
+				RecvID: req.UserID,
+				SendMsg: apistruct.SendMsg{
+					SendID:           sender.Users[0].UserID,
+					SenderNickname:   sender.Users[0].Nickname,
+					SenderFaceURL:    sender.Users[0].FaceURL,
+					SenderPlatformID: req.PlatForm,
+					Content:          mapStruct,
+					ContentType:      constant.Text,
+					SessionType:      constant.SingleChatType,
+					SendTime:         utils.GetCurrentTimestampByMill(), // millisecond
+				},
+			}
 
-		input := &apistruct.SendMsgReq{
-			RecvID: req.UserID,
-			SendMsg: apistruct.SendMsg{
-				SendID:           sender.Users[0].UserID,
-				SenderNickname:   sender.Users[0].Nickname,
-				SenderFaceURL:    sender.Users[0].FaceURL,
-				SenderPlatformID: req.PlatForm,
-				Content:          mapStruct,
-				ContentType:      constant.Text,
-				SessionType:      constant.SingleChatType,
-				SendTime:         utils.GetCurrentTimestampByMill(), // millisecond
-			},
-		}
+			opUserIDVal := c.Value(constant2.RpcOpUserID)
+			opUserID, ok := opUserIDVal.(string)
+			if !ok {
+				log.ZError(c, opUserID, errors.New("get admin token failed"))
+				apiresp.GinError(c, err)
+				return
+			}
 
-		opUserIDVal := c.Value(constant2.RpcOpUserID)
-		opUserID, ok := opUserIDVal.(string)
-		if !ok {
-			log.ZError(c, opUserID, errors.New("get admin token failed"))
-			apiresp.GinError(c, err)
-			return
-		}
+			adminToken, err := o.imApiCaller.UserToken(c, config.Config.ChatAdmin[0].ImAdminID, req.PlatForm)
+			if err != nil {
+				log.ZError(c, opUserID, errors.New("get admin token failed"))
+				apiresp.GinError(c, err)
+				return
+			}
 
-		adminToken, err := o.imApiCaller.UserToken(c, config.Config.ChatAdmin[0].ImAdminID, req.PlatForm)
-		if err != nil {
-			log.ZError(c, opUserID, errors.New("get admin token failed"))
-			apiresp.GinError(c, err)
-			return
-		}
-
-		err = callback.SendMessage(c, adminToken, input)
-		if err != nil {
-			log.ZError(c, "send Notification message error", err)
-			apiresp.GinError(c, err)
-			return
-		}
-	}()
+			err = callback.SendMessage(c, adminToken, input)
+			if err != nil {
+				log.ZError(c, "send Notification message error", err)
+				apiresp.GinError(c, err)
+				return
+			}
+		}()
+	}
 
 	apiresp.GinSuccess(c, token)
 
