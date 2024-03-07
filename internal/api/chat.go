@@ -359,8 +359,8 @@ func (o *ChatApi) UserRegister(c *gin.Context) {
 		UserIDs: []string{req.UserID},
 	}
 
-	_, err := o.chatClient.FindUserPublicInfo(c, searchUser)
-	if err != nil {
+	users, err := o.chatClient.FindUserPublicInfo(c, searchUser)
+	if users == nil {
 		addUser := &chat.AddUserAccountReq{
 			Ip:       "",
 			DeviceID: "",
