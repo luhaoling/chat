@@ -372,7 +372,7 @@ func (o *ChatApi) UserRegister(c *gin.Context) {
 				Birth:       0,
 				Gender:      0,
 				AreaCode:    "+86",
-				PhoneNumber: req.UserID,
+				PhoneNumber: "13433333333",
 				Email:       "",
 				Account:     "",
 				Password:    "",
