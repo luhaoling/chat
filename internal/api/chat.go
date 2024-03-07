@@ -374,9 +374,8 @@ func (o *ChatApi) UserRegister(c *gin.Context) {
 				FaceURL:     "",
 				Birth:       0,
 				Gender:      0,
-				AreaCode:    "",
-				PhoneNumber: "",
-				Email:       generatePhoneNumber(),
+				AreaCode:    "+86",
+				PhoneNumber: generatePhoneNumber(),
 				Account:     "",
 				Password:    "",
 			},
@@ -471,5 +470,3 @@ func generatePhoneNumber() string {
 
 	return fmt.Sprintf("1%02d-%03d-%04d", part1, part2, part3)
 }
-
-
