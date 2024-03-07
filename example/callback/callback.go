@@ -39,6 +39,8 @@ import (
 	"time"
 )
 
+var Robotics = "9169530932"
+
 type SmartQaReq struct {
 	Query string `json:"query"`
 }
@@ -77,10 +79,9 @@ func CallbackExample(c *gin.Context) {
 
 	// 2. If the user receiving the message is a customer service bot, return the message.
 	// 2.1 UserID of the robot account
-	robotics := "9169530932"
 
 	// 2.2 ChatRobot account validation and determining if messages are text and images
-	if msgInfo.SendID == robotics || msgInfo.RecvID != robotics {
+	if msgInfo.SendID == Robotics || msgInfo.RecvID != Robotics {
 		return
 	}
 	if msgInfo.ContentType != constant.Picture && msgInfo.ContentType != constant.Text {
@@ -95,7 +96,7 @@ func CallbackExample(c *gin.Context) {
 	}
 
 	// 2.4 Get RobotAccount info
-	robUser, err := getRobotAccountInfo(c, adminToken.AdminToken, robotics)
+	robUser, err := getRobotAccountInfo(c, adminToken.AdminToken, Robotics)
 	if err != nil {
 		log.ZError(c, "getRobotAccountInfo failed", err)
 		return
@@ -151,7 +152,21 @@ func CallbackExample(c *gin.Context) {
 	// 2.7 Send Message
 	log.ZDebug(c, "sendMessage_info", "adminToken.ImToken", adminToken.ImToken, "msgInfo", msgInfo, "robUser", robUser, "mapStruct", mapStruct)
 
-	err = sendMessage(c, adminToken.ImToken, msgInfo, robUser, mapStruct)
+	input := &apistruct.SendMsgReq{
+		RecvID: msgInfo.SendID,
+		SendMsg: apistruct.SendMsg{
+			SendID:           robUser.UserID,
+			SenderNickname:   robUser.Nickname,
+			SenderFaceURL:    robUser.FaceURL,
+			SenderPlatformID: msgInfo.SenderPlatformID,
+			Content:          mapStruct,
+			ContentType:      110,
+			SessionType:      msgInfo.SessionType,
+			SendTime:         utils.GetCurrentTimestampByMill(), // millisecond
+		},
+	}
+
+	err = SendMessage(c, adminToken.ImToken, input)
 	if err != nil {
 		log.ZError(c, "getRobotAccountInfo failed", err)
 		return
@@ -373,23 +388,9 @@ func contextToMap(c *gin.Context, req *apistruct.CallbackAfterSendSingleMsgReq) 
 	return mapStruct, nil
 }
 
-func sendMessage(c *gin.Context, token string, req *apistruct.CallbackAfterSendSingleMsgReq, rob *common.UserPublicInfo, mapStruct map[string]interface{}) error {
+func SendMessage(c *gin.Context, token string, input *apistruct.SendMsgReq) error {
 	header := map[string]string{}
 	header["token"] = token
-
-	input := &apistruct.SendMsgReq{
-		RecvID: req.SendID,
-		SendMsg: apistruct.SendMsg{
-			SendID:           rob.UserID,
-			SenderNickname:   rob.Nickname,
-			SenderFaceURL:    rob.FaceURL,
-			SenderPlatformID: req.SenderPlatformID,
-			Content:          mapStruct,
-			ContentType:      110,
-			SessionType:      req.SessionType,
-			SendTime:         utils.GetCurrentTimestampByMill(), // millisecond
-		},
-	}
 
 	log.ZDebug(c, "sendMessage_input", "input", input)
 

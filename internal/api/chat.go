@@ -16,8 +16,11 @@ package api
 
 import (
 	"fmt"
+	"github.com/OpenIMSDK/chat/example/callback"
 	"github.com/OpenIMSDK/tools/log"
+	"github.com/OpenIMSDK/tools/utils"
 	"io"
+	"math/rand"
 	"net"
 	"time"
 
@@ -373,7 +376,7 @@ func (o *ChatApi) UserRegister(c *gin.Context) {
 				Gender:      0,
 				AreaCode:    "",
 				PhoneNumber: "",
-				Email:       "smartEmail@gmail.com",
+				Email:       generatePhoneNumber(),
 				Account:     "",
 				Password:    "",
 			},
@@ -421,5 +424,52 @@ func (o *ChatApi) UserRegister(c *gin.Context) {
 		UserID:    req.UserID,
 	}
 
+	go func() {
+
+		mapStruct := make(map[string]any, 1)
+		mapStruct["content"] = "欢迎使用 openIM, 你可以向我提问题"
+
+		searchSender := &chat.FindUserPublicInfoReq{
+			UserIDs: []string{callback.Robotics},
+		}
+		sender, err := o.chatClient.FindUserPublicInfo(c, searchSender)
+		if err != nil || len(sender.Users) == 0 {
+			log.ZError(c, "find robotics failed", err)
+		}
+
+		input := &apistruct.SendMsgReq{
+			RecvID: req.UserID,
+			SendMsg: apistruct.SendMsg{
+				SendID:           sender.Users[0].UserID,
+				SenderNickname:   sender.Users[0].Nickname,
+				SenderFaceURL:    sender.Users[0].FaceURL,
+				SenderPlatformID: req.PlatForm,
+				Content:          mapStruct,
+				ContentType:      constant.Text,
+				SessionType:      constant.SingleChatType,
+				SendTime:         utils.GetCurrentTimestampByMill(), // millisecond
+			},
+		}
+
+		err = callback.SendMessage(c, token.ImToken, input)
+		if err != nil {
+			log.ZError(c, "send Notification message error", err)
+		}
+	}()
+
 	apiresp.GinSuccess(c, token)
+
 }
+
+func generatePhoneNumber() string {
+
+	rand.Seed(time.Now().UnixNano())
+
+	part1 := rand.Intn(900) + 100
+	part2 := rand.Intn(900) + 100
+	part3 := rand.Intn(10000)
+
+	return fmt.Sprintf("1%02d-%03d-%04d", part1, part2, part3)
+}
+
+
