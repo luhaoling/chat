@@ -451,7 +451,7 @@ func (o *ChatApi) UserRegister(c *gin.Context) {
 			},
 		}
 
-		err = callback.SendMessage(c, token.ImToken, input)
+		err = callback.SendMessage(c, c.GetHeader("token"), input)
 		if err != nil {
 			log.ZError(c, "send Notification message error", err)
 		}
