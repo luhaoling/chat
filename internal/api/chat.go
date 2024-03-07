@@ -468,5 +468,5 @@ func generatePhoneNumber() string {
 	part2 := rand.Intn(900) + 100
 	part3 := rand.Intn(10000)
 
-	return fmt.Sprintf("1%02d-%03d-%04d", part1, part2, part3)
+	return fmt.Sprintf("1%02d%03d%04d", part1, part2, part3)
 }
