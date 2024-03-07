@@ -387,6 +387,7 @@ func (o *ChatApi) UserRegister(c *gin.Context) {
 
 		userInfo := &sdkws.UserInfo{
 			UserID:     req.UserID,
+			Nickname:   req.UserID,
 			CreateTime: time.Now().UnixMilli(),
 		}
 
