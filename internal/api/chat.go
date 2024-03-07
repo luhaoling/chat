@@ -363,7 +363,7 @@ func (o *ChatApi) UserRegister(c *gin.Context) {
 	}
 
 	users, err := o.chatClient.FindUserPublicInfo(c, searchUser)
-	if len(users.Users) == 0 {
+	if users.Users == nil {
 		addUser := &chat.AddUserAccountReq{
 			Ip:       "",
 			DeviceID: "",
@@ -432,7 +432,7 @@ func (o *ChatApi) UserRegister(c *gin.Context) {
 			UserIDs: []string{callback.Robotics},
 		}
 		sender, err := o.chatClient.FindUserPublicInfo(c, searchSender)
-		if err != nil || len(sender.Users) == 0 {
+		if err != nil || sender.Users == nil {
 			log.ZError(c, "find robotics failed", err)
 		}
 
