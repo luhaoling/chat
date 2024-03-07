@@ -407,10 +407,12 @@ func (o *ChatApi) UserRegister(c *gin.Context) {
 	})
 	if err != nil {
 		apiresp.GinError(c, err)
+		return
 	}
 	imToken, err := o.imApiCaller.UserToken(c, req.UserID, req.PlatForm)
 	if err != nil {
 		apiresp.GinError(c, err)
+		return
 	}
 
 	token := apistruct.LoginResp{
@@ -420,5 +422,4 @@ func (o *ChatApi) UserRegister(c *gin.Context) {
 	}
 
 	apiresp.GinSuccess(c, token)
-
 }
