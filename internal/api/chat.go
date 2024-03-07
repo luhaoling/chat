@@ -383,6 +383,17 @@ func (o *ChatApi) UserRegister(c *gin.Context) {
 			apiresp.GinError(c, err)
 			return
 		}
+
+		userInfo := &sdkws.UserInfo{
+			UserID:     req.UserID,
+			CreateTime: time.Now().UnixMilli(),
+		}
+		err = o.imApiCaller.RegisterUser(c, []*sdkws.UserInfo{userInfo})
+		if err != nil {
+			apiresp.GinError(c, err)
+			return
+		}
+
 	}
 
 	userToken, err := o.adminClient.CreateToken(c, &admin.CreateTokenReq{
