@@ -462,13 +462,14 @@ func (o *ChatApi) UserRegister(c *gin.Context) {
 			return
 		}
 
-		adminToken, err := o.adminClient.CreateToken(c, &admin.CreateTokenReq{
-			UserID:   opUserID,
-			UserType: constant2.AdminUser,
-		})
+		adminToken, err := o.imApiCaller.UserToken(c, config.Config.ChatAdmin[0].ImAdminID, req.PlatForm)
+		if err != nil {
+			log.ZError(c, opUserID, errors.New("get admin token failed"))
+			apiresp.GinError(c, err)
+			return
+		}
 
-		log.ZDebug(c, "opUserID", "adminToken", adminToken, "opUserID", opUserID)
-		err = callback.SendMessage(c, adminToken.Token, input)
+		err = callback.SendMessage(c, adminToken, input)
 		if err != nil {
 			log.ZError(c, "send Notification message error", err)
 			apiresp.GinError(c, err)
