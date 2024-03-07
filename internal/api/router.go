@@ -65,6 +65,9 @@ func NewChatRoute(router gin.IRouter, discov discoveryregistry.SvcDiscoveryRegis
 
 	router.Group("/callbackExample").POST("/callbackAfterSendSingleMsgCommand", callback.CallbackExample)
 
+	smartCustomer := router.Group("/smartCustomer", mw.CheckToken)
+	smartCustomer.POST("register", chat.UserRegister)
+
 	logs := router.Group("/logs", mw.CheckToken)
 	logs.POST("/upload", chat.UploadLogs)
 }

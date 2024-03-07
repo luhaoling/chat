@@ -342,3 +342,67 @@ func (o *ChatApi) SearchFriend(c *gin.Context) {
 	}
 	apiresp.GinSuccess(c, resp)
 }
+
+func (o *ChatApi) UserRegister(c *gin.Context) {
+	var req struct {
+		UserID   string `json:"userID"  binding:"required"`
+		PlatForm int32  `json:"platform" binding:"required"`
+	}
+
+	if err := c.BindJSON(&req); err != nil {
+		apiresp.GinError(c, err)
+		return
+	}
+
+	searchUser := &chat.FindUserPublicInfoReq{
+		UserIDs: []string{req.UserID},
+	}
+
+	_, err := o.chatClient.FindUserPublicInfo(c, searchUser)
+	if err != nil {
+		addUser := &chat.AddUserAccountReq{
+			Ip:       "",
+			DeviceID: "",
+			Platform: req.PlatForm,
+			User: &chat.RegisterUserInfo{
+				UserID:      req.UserID,
+				Nickname:    "",
+				FaceURL:     "",
+				Birth:       0,
+				Gender:      0,
+				AreaCode:    "",
+				PhoneNumber: "",
+				Email:       "",
+				Account:     "",
+				Password:    "",
+			},
+		}
+
+		_, err := o.chatClient.AddUserAccount(c, addUser)
+		if err != nil {
+			apiresp.GinError(c, err)
+			return
+		}
+	}
+
+	userToken, err := o.adminClient.CreateToken(c, &admin.CreateTokenReq{
+		UserID:   req.UserID,
+		UserType: constant2.NormalUser,
+	})
+	if err != nil {
+		apiresp.GinError(c, err)
+	}
+	imToken, err := o.imApiCaller.UserToken(c, req.UserID, req.PlatForm)
+	if err != nil {
+		apiresp.GinError(c, err)
+	}
+
+	token := apistruct.LoginResp{
+		ImToken:   imToken,
+		ChatToken: userToken.Token,
+		UserID:    req.UserID,
+	}
+
+	apiresp.GinSuccess(c, token)
+
+}

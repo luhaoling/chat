@@ -1,3 +1,17 @@
+// Copyright © 2023 OpenIM open source community. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package callback
 
 import (
@@ -25,31 +39,30 @@ import (
 	"time"
 )
 
-/*
-curl -XPOST -H "Content-Type: application/json" -d
-'{"query": "实时音视频通讯能力的介绍"}' "http://43.134.63.160/smart_qa"
-
-@2882899447  ，智能客服的接口，接口文档后面统一梳理。
-1）POST方法，请求body是json
-2）返回body格式：
-{ "data":{
-"answer": "OpenIM平台提供可靠的信令能力，支持大规模视频会议，服务器端音视频录制，以及各种社交场景，包括一对一和群组聊天，具有管理员、群组所有者和成员的功能。",
-"source": [ "https://www.openim.io/zh" ] },
-"messge": "success",
-"retcode": 0
-}
-
-*/
-
 type SmartQaReq struct {
 	Query string `json:"query"`
 }
 
 type SmartQaResp struct {
-	Answer  string `json:"answer"`
-	Source  string `json:"source"`
-	Message string `json:"message"`
-	Retcode int    `json:"retcode"`
+	Data    DataEntity `json:"data"`
+	Messge  string     `json:"messge"`
+	Retcode int64      `json:"retcode"`
+}
+
+type DataEntity struct {
+	Answer string        `json:"answer"`
+	Source []interface{} `json:"source"`
+}
+
+type CustomMsg struct {
+	Data        CustomStu `json:"data"`
+	Description string    `json:"description"`
+	Extension   string    `json:"extension"`
+}
+
+type CustomStu struct {
+	CustomType int64      `json:"customType"`
+	Data       DataEntity `json:"data"`
 }
 
 func CallbackExample(c *gin.Context) {
@@ -60,11 +73,11 @@ func CallbackExample(c *gin.Context) {
 		return
 	}
 
-	log.ZDebug(c, "11111111111111111111111111111")
+	log.ZDebug(c, "msgInfo", "msgInfo", msgInfo)
 
 	// 2. If the user receiving the message is a customer service bot, return the message.
 	// 2.1 UserID of the robot account
-	robotics := "8984310631"
+	robotics := "9169530932"
 
 	// 2.2 ChatRobot account validation and determining if messages are text and images
 	if msgInfo.SendID == robotics || msgInfo.RecvID != robotics {
@@ -87,7 +100,7 @@ func CallbackExample(c *gin.Context) {
 		log.ZError(c, "getRobotAccountInfo failed", err)
 		return
 	}
-	log.ZDebug(c, "2222222222222222222222222222222222")
+	log.ZDebug(c, "roUser", robUser)
 
 	// 2.5 Constructing Message Field Contents
 	mapStruct, err := contextToMap(c, msgInfo)
@@ -98,7 +111,7 @@ func CallbackExample(c *gin.Context) {
 
 	// 2.6 call "http://43.134.63.160/smart_qa"
 	query, ok := mapStruct["content"].(string)
-	log.ZDebug(c, "33333333333333333333333333", query)
+	log.ZDebug(c, "get im admin token", "query", query)
 	if !ok {
 		log.ZError(c, "str, ok := any.(string)", errors.New("the query formate is error"))
 	}
@@ -110,11 +123,34 @@ func CallbackExample(c *gin.Context) {
 	if err != nil {
 		log.ZError(c, "callSmartQa failed", err)
 	}
-	log.ZDebug(c, "444444444444444444444444444444444444444444444444444", martQaResp)
+	log.ZDebug(c, "martQaResp info", "martQaResp", martQaResp)
 
-	mapStruct["content"] = martQaResp.Answer + martQaResp.Source
+	customStu := CustomMsg{
+		Data: CustomStu{
+			CustomType: 300,
+			Data:       martQaResp.Data,
+		},
+		Description: "",
+		Extension:   "",
+	}
+
+	log.ZDebug(c, "customStu of CustomMsg", "customStu", customStu)
+
+	dataJSON, err := json.Marshal(customStu.Data)
+	if err != nil {
+		log.ZError(c, "dataJSON failed", err)
+		return
+	}
+
+	mapStruct["data"] = string(dataJSON)
+	mapStruct["description"] = customStu.Description
+	mapStruct["extension"] = customStu.Extension
+
+	log.ZDebug(c, "update the context format", " mapStruct[\"content\"]", mapStruct["content"])
 
 	// 2.7 Send Message
+	log.ZDebug(c, "sendMessage_info", "adminToken.ImToken", adminToken.ImToken, "msgInfo", msgInfo, "robUser", robUser, "mapStruct", mapStruct)
+
 	err = sendMessage(c, adminToken.ImToken, msgInfo, robUser, mapStruct)
 	if err != nil {
 		log.ZError(c, "getRobotAccountInfo failed", err)
@@ -167,6 +203,8 @@ func Post(ctx context.Context, url string, header map[string]string, data any, t
 		return nil, err
 	}
 
+	log.ZDebug(ctx, "jsonStr", "jsonSTr", string(jsonStr))
+
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewBuffer(jsonStr))
 	if err != nil {
 		return nil, err
@@ -217,12 +255,12 @@ func handlingCallbackAfterSendMsg(c *gin.Context) (*apistruct.CallbackAfterSendS
 }
 
 func getAdminToken(c *gin.Context) (*apistruct.AdminLoginResp, error) {
-	url := "http://127.0.0.1:10009/account/login"
-	adminID := config.Config.ChatAdmin[0].AdminID
+	url := "http://127.0.0.1:50009/account/login"
+	adminID := config.Config.AdminList[0].AdminID
 	paswd := md5.Sum([]byte(adminID))
 
 	adminInput := admin.LoginReq{
-		Account:  config.Config.ChatAdmin[0].AdminID,
+		Account:  config.Config.AdminList[0].AdminID,
 		Password: hex.EncodeToString(paswd[:]),
 	}
 
@@ -254,7 +292,7 @@ func getRobotAccountInfo(c *gin.Context, token, robotics string) (*common.UserPu
 	header := make(map[string]string)
 	header["token"] = token
 
-	url := "http://127.0.0.1:10008/user/find/public"
+	url := "http://127.0.0.1:50008/user/find/public"
 
 	searchInput := chat.FindUserPublicInfoReq{
 		UserIDs: []string{robotics},
@@ -347,13 +385,15 @@ func sendMessage(c *gin.Context, token string, req *apistruct.CallbackAfterSendS
 			SenderFaceURL:    rob.FaceURL,
 			SenderPlatformID: req.SenderPlatformID,
 			Content:          mapStruct,
-			ContentType:      req.ContentType,
+			ContentType:      110,
 			SessionType:      req.SessionType,
 			SendTime:         utils.GetCurrentTimestampByMill(), // millisecond
 		},
 	}
 
-	url := "http://127.0.0.1:10002/msg/send_msg"
+	log.ZDebug(c, "sendMessage_input", "input", input)
+
+	url := "http://127.0.0.1:50002/msg/send_msg"
 
 	// Initiate a post request that calls the interface that sends the message (the bot sends a message to user)
 	_, err := Post(c, url, header, input, 10)
@@ -372,16 +412,27 @@ func callSmartQa(c *gin.Context, smartQaRea *SmartQaReq) (*SmartQaResp, error) {
 		return nil, err
 	}
 
-	var resp SmartQaResp
+	log.ZDebug(c, "callSmartQa", "body", string(body))
 
-	err = json.Unmarshal(body, &resp)
+	response := &SmartQaResp{
+		Data: DataEntity{
+			Answer: "",
+			Source: make([]interface{}, 10),
+		},
+		Messge:  "",
+		Retcode: 0,
+	}
+
+	err = json.Unmarshal(body, &response)
 	if err != nil {
 		return nil, fmt.Errorf("json.Unmarshal failed,err:%v", err)
 	}
 
-	if resp.Retcode != 0 {
-		return nil, fmt.Errorf("call \"http://43.134.63.160/smart_qa\" error, resp.Retcode:%d", resp.Retcode)
+	log.ZDebug(c, "after Unmarshal", "body", response)
+
+	if response.Retcode != 0 {
+		return nil, fmt.Errorf("call \"http://43.134.63.160/smart_qa\" error, resp.Retcode:%d", response)
 	}
 
-	return &resp, nil
+	return response, nil
 }
