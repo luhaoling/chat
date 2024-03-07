@@ -18,7 +18,6 @@ import (
 	"fmt"
 	"github.com/OpenIMSDK/tools/log"
 	"io"
-	"math/rand"
 	"net"
 	"time"
 
@@ -374,7 +373,7 @@ func (o *ChatApi) UserRegister(c *gin.Context) {
 				Gender:      0,
 				AreaCode:    "",
 				PhoneNumber: "",
-				Email:       "smartEmail@gmail",
+				Email:       "smartEmail@gmail.com",
 				Account:     "",
 				Password:    "",
 			},
@@ -423,17 +422,4 @@ func (o *ChatApi) UserRegister(c *gin.Context) {
 	}
 
 	apiresp.GinSuccess(c, token)
-}
-
-func generatePhoneNumber() string {
-	// 初始化随机数生成器
-	rand.Seed(time.Now().UnixNano())
-
-	// 生成电话号码的三个部分，确保第一部分以1开头
-	part1 := rand.Intn(900) + 100 // 确保这一部分不会以0开始
-	part2 := rand.Intn(900) + 100 // 同上
-	part3 := rand.Intn(10000)     // 这一部分可以包含前导0
-
-	// 返回格式化的电话号码，确保第一部分始终以1开头
-	return fmt.Sprintf("1%02d-%03d-%04d", part1, part2, part3)
 }
