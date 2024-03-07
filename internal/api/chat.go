@@ -16,6 +16,7 @@ package api
 
 import (
 	"fmt"
+	"github.com/OpenIMSDK/tools/log"
 	"io"
 	"net"
 	"time"
@@ -388,11 +389,14 @@ func (o *ChatApi) UserRegister(c *gin.Context) {
 			UserID:     req.UserID,
 			CreateTime: time.Now().UnixMilli(),
 		}
+
+		log.ZDebug(c, "RegisterUserBefore", "register", userInfo)
 		err = o.imApiCaller.RegisterUser(c, []*sdkws.UserInfo{userInfo})
 		if err != nil {
 			apiresp.GinError(c, err)
 			return
 		}
+		log.ZDebug(c, "RegisterUserAfter", "register", userInfo)
 
 	}
 
