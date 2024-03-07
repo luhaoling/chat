@@ -15,6 +15,7 @@
 package api
 
 import (
+	"errors"
 	"fmt"
 	"github.com/OpenIMSDK/chat/example/callback"
 	"github.com/OpenIMSDK/tools/log"
@@ -435,6 +436,7 @@ func (o *ChatApi) UserRegister(c *gin.Context) {
 		log.ZDebug(c, "sender", "sender", sender)
 		if err != nil || sender.Users == nil {
 			log.ZError(c, "find robotics failed", err)
+			return
 		}
 
 		input := &apistruct.SendMsgReq{
@@ -451,9 +453,22 @@ func (o *ChatApi) UserRegister(c *gin.Context) {
 			},
 		}
 
-		err = callback.SendMessage(c, c.GetHeader("token"), input)
+		opUserIDVal := c.Value(constant2.RpcOpUserID)
+		opUserID, ok := opUserIDVal.(string)
+		if !ok {
+			log.ZError(c, opUserID, errors.New("get admin token failed"))
+			return
+		}
+
+		adminToken, err := o.adminClient.CreateToken(c, &admin.CreateTokenReq{
+			UserID:   opUserID,
+			UserType: constant2.AdminUser,
+		})
+
+		err = callback.SendMessage(c, adminToken.Token, input)
 		if err != nil {
 			log.ZError(c, "send Notification message error", err)
+			return
 		}
 	}()
 

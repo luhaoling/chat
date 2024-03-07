@@ -89,7 +89,7 @@ func CallbackExample(c *gin.Context) {
 	}
 
 	// 2.3 Get administrator token
-	adminToken, err := getAdminToken(c)
+	adminToken, err := GetAdminToken(c)
 	if err != nil {
 		log.ZError(c, "getAdminToken failed", err)
 		return
@@ -269,7 +269,7 @@ func handlingCallbackAfterSendMsg(c *gin.Context) (*apistruct.CallbackAfterSendS
 	return &req, nil
 }
 
-func getAdminToken(c *gin.Context) (*apistruct.AdminLoginResp, error) {
+func GetAdminToken(c *gin.Context) (*apistruct.AdminLoginResp, error) {
 	url := "http://127.0.0.1:10009/account/login"
 	adminID := config.Config.AdminList[0].AdminID
 	paswd := md5.Sum([]byte(adminID))
