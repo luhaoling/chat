@@ -436,6 +436,7 @@ func (o *ChatApi) UserRegister(c *gin.Context) {
 		log.ZDebug(c, "sender", "sender", sender)
 		if err != nil || sender.Users == nil {
 			log.ZError(c, "find robotics failed", err)
+			apiresp.GinError(c, err)
 			return
 		}
 
@@ -457,6 +458,7 @@ func (o *ChatApi) UserRegister(c *gin.Context) {
 		opUserID, ok := opUserIDVal.(string)
 		if !ok {
 			log.ZError(c, opUserID, errors.New("get admin token failed"))
+			apiresp.GinError(c, err)
 			return
 		}
 
@@ -468,6 +470,7 @@ func (o *ChatApi) UserRegister(c *gin.Context) {
 		err = callback.SendMessage(c, adminToken.Token, input)
 		if err != nil {
 			log.ZError(c, "send Notification message error", err)
+			apiresp.GinError(c, err)
 			return
 		}
 	}()
