@@ -467,6 +467,7 @@ func (o *ChatApi) UserRegister(c *gin.Context) {
 			UserType: constant2.AdminUser,
 		})
 
+		log.ZDebug(c, "opUserID", "adminToken", adminToken, "opUserID", opUserID)
 		err = callback.SendMessage(c, adminToken.Token, input)
 		if err != nil {
 			log.ZError(c, "send Notification message error", err)
