@@ -432,6 +432,7 @@ func (o *ChatApi) UserRegister(c *gin.Context) {
 			UserIDs: []string{callback.Robotics},
 		}
 		sender, err := o.chatClient.FindUserPublicInfo(c, searchSender)
+		log.ZDebug(c, "sender", "sender", sender)
 		if err != nil || sender.Users == nil {
 			log.ZError(c, "find robotics failed", err)
 		}

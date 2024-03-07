@@ -270,7 +270,7 @@ func handlingCallbackAfterSendMsg(c *gin.Context) (*apistruct.CallbackAfterSendS
 }
 
 func getAdminToken(c *gin.Context) (*apistruct.AdminLoginResp, error) {
-	url := "http://127.0.0.1:50009/account/login"
+	url := "http://127.0.0.1:10009/account/login"
 	adminID := config.Config.AdminList[0].AdminID
 	paswd := md5.Sum([]byte(adminID))
 
@@ -307,7 +307,7 @@ func getRobotAccountInfo(c *gin.Context, token, robotics string) (*common.UserPu
 	header := make(map[string]string)
 	header["token"] = token
 
-	url := "http://127.0.0.1:50008/user/find/public"
+	url := "http://127.0.0.1:10008/user/find/public"
 
 	searchInput := chat.FindUserPublicInfoReq{
 		UserIDs: []string{robotics},
@@ -394,7 +394,7 @@ func SendMessage(c *gin.Context, token string, input *apistruct.SendMsgReq) erro
 
 	log.ZDebug(c, "sendMessage_input", "input", input)
 
-	url := "http://127.0.0.1:50002/msg/send_msg"
+	url := "http://127.0.0.1:10002/msg/send_msg"
 
 	// Initiate a post request that calls the interface that sends the message (the bot sends a message to user)
 	_, err := Post(c, url, header, input, 10)
